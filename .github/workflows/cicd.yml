@@ -10,6 +10,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install JQ
+        run: apt-get install jq -y 
+
       - name: Run version script
         run: |
           chmod +x ./version.sh
