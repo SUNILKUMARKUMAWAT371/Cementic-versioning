@@ -1,6 +1,12 @@
-name: Semantic Versioning
+name: versioning
 
 on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type: major, minor, or patch'
+        required: true
+        default: 'patch'
   push:
     branches:
       - main
@@ -9,18 +15,80 @@ on:
       - main
 
 jobs:
-  Install_version_deploy:
+  build:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install JQ
-        run: sudo apt-get install jq -y 
-
-      - name: Run version script
+      - name: Set up Git
         run: |
-          chmod +x ./version.sh
-          ./version.sh
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Bump Semantic Version
+        id: version
+        run: |
+          version_type="${{ github.event.inputs.version_bump }}"
+          current_version=$(git describe --tags --abbrev=0)
+          IFS='.' read -r -a version_parts <<< "$current_version"
+          major=${version_parts[0]:-0}
+          minor=${version_parts[1]:-0}
+          patch=${version_parts[2]:-0}
+          if [ "$version_type" == "major" ]; then
+            major=$((major+1))
+            minor=0
+            patch=0
+          elif [ "$version_type" == "minor" ]; then
+            minor=$((minor+1))
+            patch=0
+          elif [ "$version_type" == "patch" ]; then
+            patch=$((patch+1))
+          fi
+          new_version="$major.$minor.$patch"
+          echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
+      - name: Commit New Version
+        run: |
+          git fetch --tags
+          git tag -a v${{ env.new_version }} -m "Version bump to ${{ env.new_version }}"
+          git push origin --tags
+
+
+
+
+
+
+
+
+# name: Semantic Versioning
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+
+# jobs:
+#   Install_version_deploy:
+#     runs-on: ubuntu-latest
+    
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Install JQ
+#         run: sudo apt-get install jq -y 
+
+#       - name: Run version script
+#         run: |
+#           chmod +x ./version.sh
+#           ./version.sh
+
+
+
+
 
