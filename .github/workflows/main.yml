@@ -37,7 +37,7 @@ jobs:
             patch=$((patch+1))
           fi
           new_version="$major.$minor.$patch"
-          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/SUNILKUMARKUMAWAT371/Cementic-versioning/actions/variables/"${{ env.PROD_SEMANTIC_VERSION }}" -d '{"name": "'"${{ env.PROD_SEMANTIC_VERSION }}"'", "value": "'"$new_version"'"}'
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/SUNILKUMARKUMAWAT371/Cementic-versioning/actions/variables/prod_semantic_version -d '{"name": "'"prod_semantic_version"'", "value": "'"1.1.6"'"}'
           echo "New version: $new_version"
           echo "new_version=$new_version"
 
