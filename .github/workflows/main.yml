@@ -6,7 +6,6 @@ on:
       version:
         description: 'Version type: major, minor, or patch'
         required: true
-        default: 'patch'
 
 jobs:
   build:
