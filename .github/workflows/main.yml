@@ -40,6 +40,9 @@ jobs:
           new_version="$major.$minor.$patch"
           echo "New version: $new_version"
 
+          # Set the new version as output for the next steps
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
       - name: Update Version on github
         run: |
           curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/SUNILKUMARKUMAWAT371/Cementic-versioning/actions/variables/prod_semantic_version -d '{"name": "prod_semantic_version", "value": "'"$new_version"'"}'
