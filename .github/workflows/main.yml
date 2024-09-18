@@ -1,18 +1,12 @@
-name: versioning
+name: Semantic_Versioning_CICD
 
 on:
   workflow_dispatch:
     inputs:
-      version_bump:
+      version:
         description: 'Version bump type: major, minor, or patch'
         required: true
         default: 'patch'
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build:
@@ -21,20 +15,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Git
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-      - name: Bump Semantic Version
+      - name: Semantic Version
         id: version
         run: |
-          version_type="${{ github.event.inputs.version_bump }}"
-          current_version=$(git describe --tags --abbrev=0)
+          version_type="${{ github.event.inputs.version }}"
+          current_version="${{ env.PROD_SEMANTIC_VERSION }}"
+                  
           IFS='.' read -r -a version_parts <<< "$current_version"
           major=${version_parts[0]:-0}
           minor=${version_parts[1]:-0}
           patch=${version_parts[2]:-0}
+                    
           if [ "$version_type" == "major" ]; then
             major=$((major+1))
             minor=0
@@ -46,15 +37,52 @@ jobs:
             patch=$((patch+1))
           fi
           new_version="$major.$minor.$patch"
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/SUNILKUMARKUMAWAT371/Cementic-versioning/actions/variables/"${{ env.PROD_SEMANTIC_VERSION }}" -d '{"name": "'"${{ env.PROD_SEMANTIC_VERSION }}"'", "value": "'"$new_version"'"}'
           echo "New version: $new_version"
-          echo "new_version=$new_version" >> $GITHUB_ENV
+          echo "new_version=$new_version"
 
-      - name: Commit New Version
-        run: |
-          git fetch --tags
-          git tag -a v${{ env.new_version }} -m "Version bump to ${{ env.new_version }}"
-          git push origin --tags
 
+
+
+
+#name: Semantic_Versioning_CICD
+
+#on:
+#  workflow_dispatch:
+#    inputs:
+#      version:
+#        description: 'Version bump type: major, minor, or patch'
+#        required: true
+#        default: 'patch'
+
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+
+#      - name: Semantic Version
+#        id: version
+#        run: |
+#          version_type="${{ github.event.inputs.version }}"
+#          IFS='.' read -r -a version_parts <<< "$sematic_version"
+#          major=${version_parts[0]:-0}
+#          minor=${version_parts[1]:-0}
+#          patch=${version_parts[2]:-0}
+#          if [ "$version_type" == "major" ]; then
+#            major=$((major+1))
+#            minor=0
+#            patch=0
+#          elif [ "$version_type" == "minor" ]; then
+#            minor=$((minor+1))
+#            patch=0
+#          elif [ "$version_type" == "patch" ]; then
+#            patch=$((patch+1))
+#          fi
+#          new_sematic_version="$major.$minor.$patch"
+#          echo "New version: $new_sematic_version"
+#          echo "new_version=$new_sematic_version" >> $GITHUB_ENV
 
 
 
