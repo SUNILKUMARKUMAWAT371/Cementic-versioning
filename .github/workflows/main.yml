@@ -20,6 +20,7 @@ jobs:
         run: |
           version_type="${{ github.event.inputs.version }}"
           current_version="${{ env.prod_semantic_version }}"
+          echo current version is "${{ env.prod_semantic_version }}"
           
           IFS='.' read -r -a version_parts <<< "$current_version"
           major=${version_parts[0]:-0}
@@ -41,7 +42,7 @@ jobs:
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_ENV
           
-          GH_TOKEN="GH_TOKEN=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" 
+          GH_TOKEN="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" 
           curl -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
           https://api.github.com/repos/${{ github.repository }}/actions/variables/prod_semantic_version \
           -d '{"name": "prod_semantic_version", "value": "'"$new_version"'"}'
