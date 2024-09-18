@@ -15,20 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get Current Version
-        run: |
-          # Fetching the current version stored in a repository variable
-          current_version=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" \
-          https://api.github.com/repos/${{ github.repository }}/actions/variables/prod_semantic_version | jq -r '.value')
-          
-          echo "Current version: $current_version"
-          echo "current_version=$current_version" >> $GITHUB_ENV
-
       - name: Semantic Version Bump
         id: version
         run: |
           version_type="${{ github.event.inputs.version }}"
-          current_version="${{ env.current_version }}"
+          current_version="${{ env.prod_semantic_version }}"
           
           IFS='.' read -r -a version_parts <<< "$current_version"
           major=${version_parts[0]:-0}
@@ -49,10 +40,9 @@ jobs:
           new_version="$major.$minor.$patch"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_ENV
-
-      - name: Update Version in GitHub Repository Variables
-        run: |
-          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" \
+          
+          GH_TOKEN="GH_TOKEN=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" 
+          curl -X PATCH -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
           https://api.github.com/repos/${{ github.repository }}/actions/variables/prod_semantic_version \
           -d '{"name": "prod_semantic_version", "value": "'"$new_version"'"}'
 
