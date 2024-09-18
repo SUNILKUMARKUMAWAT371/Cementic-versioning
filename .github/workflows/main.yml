@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Semantic Version Bump
+      - name: Semantic Version
         id: version
         run: |
           version_type="${{ github.event.inputs.version }}"
@@ -39,12 +39,11 @@ jobs:
           
           new_version="$major.$minor.$patch"
           echo "New version: $new_version"
-          
+
+      - name: Update Version on github
+        run: |
           curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/SUNILKUMARKUMAWAT371/Cementic-versioning/actions/variables/prod_semantic_version -d '{"name": "prod_semantic_version", "value": "'"$new_version"'"}'
-
-
-
-
+          echo new version is $new_version
 
 #name: Semantic_Versioning_CICD
 
