@@ -24,6 +24,7 @@ jobs:
           echo current version is from env "${{ env.prod_semantic_version }}"
           echo current version is from dollar $prod_semantic_version
           echo current version is from var $var.prod_semantic_version
+          echo current version is from env "${{ env.PROD_SEMANTIC_VERSION }}"
           
           IFS='.' read -r -a version_parts <<< "$current_version"
           major=${version_parts[0]:-0}
