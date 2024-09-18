@@ -19,13 +19,8 @@ jobs:
         id: version
         run: |
           version_type="${{ github.event.inputs.version }}"
-          #current_version="${{ env.prod_semantic_version }}"
-          current_version=0.0.0
-          echo current version is from env "${{ env.prod_semantic_version }}"
-          echo current version is from dollar $prod_semantic_version
-          echo current version is from var $var.prod_semantic_version
-          echo current version is from env "${{ env.PROD_SEMANTIC_VERSION }}"
-          echo current version is from vars ${{ vars.prod_semantic_version }}
+          current_version=${{ vars.prod_semantic_version }}
+          echo current version is $current_version
           
           IFS='.' read -r -a version_parts <<< "$current_version"
           major=${version_parts[0]:-0}
