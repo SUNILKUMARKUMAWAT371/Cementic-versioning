@@ -2,10 +2,6 @@ name: Dev CICD
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version type: major, minor, or patch'
-        required: true
 
 jobs:
   build:
