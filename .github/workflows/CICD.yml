@@ -7,7 +7,6 @@ on:
 
 jobs:
   release:
-    if: github.ref == 'refs/heads/tag'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,6 +17,9 @@ jobs:
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           echo "Release Tag: $TAG_NAME"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          echo cicd run by $GIT_COMMITTER_NAME
+          echo branch name is $GITHUB_REF
+          echo commit id is $GITHUB_SHA
 
       - name: Print the tag in a bash script
         run: |
