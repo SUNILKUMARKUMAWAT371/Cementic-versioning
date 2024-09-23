@@ -20,6 +20,7 @@ jobs:
           echo cicd run by $GIT_COMMITTER_NAME
           echo branch name is $GITHUB_REF
           echo commit id is $GITHUB_SHA
+          echo "branch is tag-2"
 
       - name: Print the tag in a bash script
         run: |
