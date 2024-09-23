@@ -1,12 +1,15 @@
-name: Release Workflow
+name: CICD Workflow
 
 on:
   push:
     tags:
-      - 'v*.*.*'  # This triggers the workflow when a new tag is pushed, like v1.0.0
+      - 'v*.*.*'
+    branches:
+      - tag
 
 jobs:
   release:
+    if: github.ref == 'refs/heads/tag'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
