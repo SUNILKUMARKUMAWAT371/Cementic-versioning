@@ -34,7 +34,6 @@ jobs:
       - name: agvtool1
         id: version
         run: |
-          cd ios 
           echo "BuildNumber Tag: $buildNumber"
           echo "Sementic Tag: $new_version"
           echo 
