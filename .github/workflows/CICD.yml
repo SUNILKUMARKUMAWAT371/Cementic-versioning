@@ -15,6 +15,13 @@ jobs:
       - name: Get the release tag
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
+          NUMERIC_TAG=${TAG_NAME#v}  # This removes the leading 'v'
+          echo "Release Tag: $TAG_NAME"
+          echo "sementic tag: $NUMERIC_TAG"
+          echo "TAG_NAME=$NUMERIC_TAG" >> $GITHUB_ENV
+
+        
+          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           echo "Release Tag: $TAG_NAME"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           echo cicd run by $GIT_COMMITTER_NAME
