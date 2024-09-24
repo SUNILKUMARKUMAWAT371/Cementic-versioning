@@ -12,23 +12,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get the release tag
+      - name: release version
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
-          NUMERIC_TAG=${TAG_NAME#v}  # This removes the leading 'v'
-          echo "Release Tag: $TAG_NAME"
-          echo "sementic tag: $NUMERIC_TAG"
-          echo "TAG_NAME=$NUMERIC_TAG" >> $GITHUB_ENV
+          NUMERIC_TAG=${TAG_NAME#v}
+  
+          if [ "$NUMERIC_TAG" == "${{ vars.PRODUCTION_VERSION }}" ]; then
+              echo "Sementic Tag: $NUMERIC_TAG"
+              echo "new_version=$NUMERIC_TAG" >> $GITHUB_ENV
+              buildNumber=$((${{ vars.PRODUCTION_BUILD_NUMBER }} + 1))
+              echo "BuildNumber Tag: $buildNumber"
+              echo "buildNumber=$buildNumber" >> $GITHUB_ENV
+          else
+              echo "Sementic Tag: $NUMERIC_TAG"
+              echo "new_version=$NUMERIC_TAG" >> $GITHUB_ENV
+              buildNumber=1
+              echo "BuildNumber Tag: $buildNumber"
+              echo "buildNumber=$buildNumber" >> $GITHUB_ENV
+          fi
 
-        
-          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
-          echo "Release Tag: $TAG_NAME"
-          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-          echo cicd run by $GIT_COMMITTER_NAME
-          echo branch name is $GITHUB_REF
-          echo commit id is $GITHUB_SHA
-          echo "branch is tag-2"
-
-      - name: Print the tag in a bash script
+      - name: agvtool1
+        id: version
         run: |
-          echo "The release tag is $TAG_NAME"
+          cd ios 
+          echo "BuildNumber Tag: $buildNumber"
+          echo "Sementic Tag: $new_version"
+          echo 
+
+      - name: Upload to TestFlight
+        run: |
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/variables/production_version -d '{"name": "production_version", "value": "'"$new_version"'"}'
+          curl -X PATCH -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/actions/variables/production_build_number -d '{"name": "production_build_number", "value": "'"$buildNumber"'"}'
+          echo New Sematic Version number is $new_version upload to TestFlight
+  
