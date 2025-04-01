@@ -11,3 +11,19 @@ Node.js is set up.
 Dependencies are installed.
 The version-bump.sh script is executed, prompting the user to choose between a major, minor, or patch version bump.
 This setup ensures that every time you run the workflow, it will ask you for the type of version bump you'd like to apply.
+
+
+
+## Helper Function
+
+### `getEnvironmentName(branch)`
+
+-   Determines the environment based on the Git branch:
+
+    | Branch                       | Environment |
+    |------------------------------|-------------|
+    | `origin/feat/nonBureauOffers` | `staging`   |
+    | `origin/feat/appTypes`       | `preprod`   |
+    | `origin/release/prod`        | `prod`      |
+
+## Usage
