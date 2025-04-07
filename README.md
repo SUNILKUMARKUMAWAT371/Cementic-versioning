@@ -31,7 +31,6 @@ This setup ensures that every time you run the workflow, it will ask you for the
 
 
 
-
 # Helm Chart Deployment & GCP NEG Integration Guide
 
 This guide explains how to deploy and upgrade Helm charts for the nginx-ingress controller, configure GCP Zonal Network Endpoint Groups (NEGs), and properly set up firewall rules and load balancer integration.
@@ -46,10 +45,11 @@ helm upgrade --install ingress-nginx ./ --namespace ingress --create-namespace
 
 This command installs or upgrades the ingress-nginx release from the local chart (./) into the ingress namespace. If the namespace doesn't exist, it will be created automatically.
 
-⚙️ Configuration for GCP NEG (Zonal Network Endpoint Groups)
+### ⚙️ Configuration for GCP NEG (Zonal Network Endpoint Groups)
+
 To automatically create and configure NEGs for the nginx-ingress controller service:
 
-Edit values.yaml File:
+#### Edit values.yaml File:
 
 Locate the values.yaml file in your Helm chart directory.
 Go to line number 441 (or find the section where the controller service is defined).
@@ -65,10 +65,10 @@ controller:
 
 These annotations inform GKE to create a standalone NEG for the Ingress controller, enabling fine-grained traffic control at the load balancer level.
 
-🔒 Firewall Configuration for Load Balancer Health Checks
+### 🔒 Firewall Configuration for Load Balancer Health Checks
 After deploying and setting up NEGs:
 
-Enable Health Check Ports:
+#### Enable Health Check Ports:
 
 GCP load balancers perform health checks on backend services using NEGs.
 Ensure that the VPC firewall rules allow ingress traffic on the health check port (usually port 10256 or similar) from the GCP health check IP ranges.
@@ -87,21 +87,21 @@ gcloud compute firewall-rules create allow-health-check \
     --protocol tcp
 ```
 
-✅ Traffic Routing via Load Balancer
+### ✅ Traffic Routing via Load Balancer
 Once the NEG is healthy:
 
 GCP Load Balancer will successfully route traffic to the NEG, which in turn targets the GKE nginx-ingress controller.
 The controller will then distribute traffic to services defined in your ingress resources.
 This setup ensures high availability, scalability, and better traffic observability.
 
-📚 Official GCP Documentation
+## 📚 Official GCP Documentation
 Refer to the following links for detailed official documentation from Google Cloud:
 
 ```https://cloud.google.com/kubernetes-engine/docs/how-to/standalone-neg
 https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters
 ```
 
-📌 Notes
+## 📌 Notes
 Make sure your GKE nodes have the appropriate IAM roles and tags for NEG and Load Balancer integration.
 
 Always validate your configuration after Helm install/upgrade using:
@@ -109,4 +109,3 @@ Always validate your configuration after Helm install/upgrade using:
 ```bash
 kubectl describe svc ingress-nginx-controller -n ingress
 ```
-
