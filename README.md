@@ -1,111 +1,244 @@
-# Cementic-versioning
-Here's we add bash script that we can use in a GitHub Actions workflow to handle semantic versioning. This script will prompt the user to choose between a major, minor, or patch version upgrade.
+# ONDC OFFICIAL
 
-# Workflow Explanation
-Trigger: This workflow is triggered manually using workflow_dispatch, allowing you to choose when to bump the version.
+## Overview
 
-Steps:
+This repository contains the configuration and deployment scripts for various ONDC (Open Network for Digital Commerce) components across different environments. It includes mock servers, protocol server engines, sandbox components, and utilities for domains like B2B, FIS (Financial Information Services), IGM (Issue and Grievance Management), RSF (Registry and Settlement Framework), and TRV (Travel).
 
-The repository is checked out.
-Node.js is set up.
-Dependencies are installed.
-The version-bump.sh script is executed, prompting the user to choose between a major, minor, or patch version bump.
-This setup ensures that every time you run the workflow, it will ask you for the type of version bump you'd like to apply.
+## Environments
 
+The repository manages configurations for the following environments:
 
+*   **Staging:** Used for testing and validation before production. All components (B2B, FIS, IGM, RSF, TRV) are deployed to the Staging environment.
+*   **Preprod (Pre-production):** A final testing environment closely mirroring production. Currently, only IGM and RSF components are deployed to the Preprod environment.
 
-## Helper Function
+*Note: While the folder structure includes `preprod` directories for FIS, B2B, and TRV components, the current deployment strategy targets only the Staging environment for these specific components.*
 
-### `getEnvironmentName(branch)`
+## Folder Structure
 
--   Determines the environment based on the Git branch:
+The repository is organized by component, then service/utility within that component, and finally by environment. Each environment-specific directory typically contains a `Jenkinsfile` for CI/CD pipelines and an `env` file or configuration related to that environment.
 
-    | Branch                       | Environment |
-    |------------------------------|-------------|
-    | `origin/feat/nonBureauOffers` | `staging`   |
-    | `origin/feat/appTypes`       | `preprod`   |
-    | `origin/release/prod`        | `prod`      |
-
-## Usage
-
-
-
-
-# Helm Chart Deployment & GCP NEG Integration Guide
-
-This guide explains how to deploy and upgrade Helm charts for the nginx-ingress controller, configure GCP Zonal Network Endpoint Groups (NEGs), and properly set up firewall rules and load balancer integration.
-
-## 🚀 Deployment & Upgrade using Helm
-
-To deploy or upgrade the nginx-ingress Helm chart, use the following command:
-
-```bash
-helm upgrade --install ingress-nginx ./ --namespace ingress --create-namespace
+```
+ONDC
+├── B2B
+│   └── ondc_mock_server
+│       ├── preprod
+│       └── staging
+│           ├── Jenkinsfile
+│           └── env
+├── FIS
+│   ├── mock_server_utility
+│   │   ├── preprod
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   ├── protocol_server_engine
+│   │   ├── preprod
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   ├── sandbox_backend
+│   │   ├── preprod
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   ├── sandbox_ui
+│   │   ├── preprod
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   └── seller_mock_engine
+│       ├── preprod
+│       └── staging
+│           ├── Jenkinsfile
+│           └── env
+├── IGM
+│   ├── mock_ui
+│   │   ├── preprod
+│   │   │   ├── Jenkinsfile
+│   │   │   └── env
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   ├── protocol_server_engine
+│   │   ├── preprod
+│   │   │   ├── Jenkinsfile
+│   │   │   └── env
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   └── seller_mock_engine
+│       ├── preprod
+│       │   ├── Jenkinsfile
+│       │   └── env
+│       └── staging
+│           ├── Jenkinsfile
+│           └── env
+├── RSF
+│   ├── mock_ui
+│   │   ├── preprod
+│   │   │   ├── Jenkinsfile
+│   │   │   └── env
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   ├── protocol_server_engine
+│   │   ├── preprod
+│   │   │   ├── Jenkinsfile
+│   │   │   └── env
+│   │   └── staging
+│   │       ├── Jenkinsfile
+│   │       └── env
+│   └── seller_mock_engine
+│       ├── preprod
+│       │   ├── Jenkinsfile
+│       │   └── env
+│       └── staging
+│           ├── Jenkinsfile
+│           └── env
+├── TRV
+    ├── mock_server_utility
+    │   ├── preprod
+    │   └── staging
+    │       ├── Jenkinsfile
+    │       └── env
+    ├── protocol_server_engine
+    │   ├── preprod
+    │   └── staging
+    │       ├── Jenkinsfile
+    │       └── env
+    ├── sandbox_backend
+    │   ├── preprod
+    │   └── staging
+    │       ├── Jenkinsfile
+    │       └── env
+    ├── sandbox_ui
+    │   ├── preprod
+    │   └── staging
+    │       ├── Jenkinsfile
+    │       └── env
+    └── seller_mock_engine
+        ├── preprod
+        └── staging
+            ├── Jenkinsfile
+            └── env
 ```
 
-This command installs or upgrades the ingress-nginx release from the local chart (./) into the ingress namespace. If the namespace doesn't exist, it will be created automatically.
+## Components
 
-### ⚙️ Configuration for GCP NEG (Zonal Network Endpoint Groups)
+*   **B2B:** Components related to Business-to-Business interactions.
+*   **FIS:** Components related to Financial Information Services.
+*   **IGM:** Components for Issue and Grievance Management.
+*   **RSF:** Components for Registry and Settlement Framework.
+*   **TRV:** Components related to the Travel domain.
 
-To automatically create and configure NEGs for the nginx-ingress controller service:
+Each component directory contains sub-directories for specific services like `mock_server_utility`, `protocol_server_engine`, `sandbox_backend`, `sandbox_ui`, `seller_mock_engine`, etc.
 
-#### Edit values.yaml File:
+## Deployment
 
-Locate the values.yaml file in your Helm chart directory.
-Go to line number 441 (or find the section where the controller service is defined).
-Add or modify annotations under the service configuration to enable NEG creation.
-Example Annotations:
+Deployments to the Staging and Preprod environments are automated using Jenkins pipelines.
 
-```yaml
-controller:
-  service:
-    annotations:
-      cloud.google.com/neg: '{"exposed_ports": {"80":{"name": "gke-neg"}}}'
-```
+*   Each service within a component and environment (e.g., `IGM/mock_ui/staging/`) contains a `Jenkinsfile` defining its specific deployment pipeline.
+*   These pipelines typically handle tasks such as:
+    *   Checking out the correct source code branch.
+    *   Loading environment-specific configurations and secrets.
+    *   Building Docker images (if applicable).
+    *   Deploying the application (e.g., using Docker Compose on target EC2 instances).
+    *   Performing necessary cleanup actions.
 
-These annotations inform GKE to create a standalone NEG for the Ingress controller, enabling fine-grained traffic control at the load balancer level.
+For detailed information on a specific deployment pipeline, refer to the `Jenkinsfile` within the corresponding service/environment directory.
 
-### 🔒 Firewall Configuration for Load Balancer Health Checks
-After deploying and setting up NEGs:
+## Prerequisites
 
-#### Enable Health Check Ports:
+*   Git: For cloning and managing the repository.
+*   Access to the relevant Jenkins instance (for triggering deployments).
+*   Appropriate credentials configured in Jenkins (e.g., SSH keys, secret files) for accessing target deployment servers and environment variables.
+#
+#
 
-GCP load balancers perform health checks on backend services using NEGs.
-Ensure that the VPC firewall rules allow ingress traffic on the health check port (usually port 10256 or similar) from the GCP health check IP ranges.
-Without this, the NEG will show as unhealthy, and traffic will not be routed to your GKE cluster.
+# Jenkinsfile Structure
 
-Example Firewall Rule Setup:
+## Overview
 
-```bash
-gcloud compute firewall-rules create allow-health-check \
-    --network default \
-    --action allow \
-    --direction ingress \
-    --source-ranges 130.211.0.0/22,35.191.0.0/16 \
-    --target-tags your-gke-node-tag \
-    --ports 10256 \
-    --protocol tcp
-```
+This repository contains a `Jenkinsfile` that defines a declarative pipeline for automating the deployment of the `ONDC-Official/mock-server-utility` application (specifically the `TRV` branch) to a designated staging EC2 instance.
 
-### ✅ Traffic Routing via Load Balancer
-Once the NEG is healthy:
+The pipeline performs the following key actions:
+1.  Loads sensitive environment variables from Jenkins credentials.
+2.  Connects to the target EC2 instance via SSH.
+3.  Clones the specified Git repository or updates the existing clone.
+4.  Writes the loaded environment variables to a `.env` file on the EC2 instance.
+5.  Uses Docker Compose to stop, build, and deploy the application containers.
+6.  Includes a (currently partial) cleanup stage for Docker resources.
 
-GCP Load Balancer will successfully route traffic to the NEG, which in turn targets the GKE nginx-ingress controller.
-The controller will then distribute traffic to services defined in your ingress resources.
-This setup ensures high availability, scalability, and better traffic observability.
+## Prerequisites
 
-## 📚 Official GCP Documentation
-Refer to the following links for detailed official documentation from Google Cloud:
+Before running this pipeline, ensure the following are configured:
 
-```https://cloud.google.com/kubernetes-engine/docs/how-to/standalone-neg
-https://cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer-parameters
-```
+1.  **Jenkins Instance:** A running Jenkins instance with necessary plugins installed (Pipeline, Credentials Binding, SSH Agent).
+2.  **EC2 Instance:**
+    *   An accessible EC2 instance with the IP address `3.7.217.131`.
+    *   An SSH user `ahsan_witslab` configured on the EC2 instance.
+    *   This user must have `sudo` privileges to run Docker commands and write the `.env` file.
+    *   Docker and Docker Compose must be installed and running on the EC2 instance.
+3.  **Jenkins Credentials:**
+    *   **`TRV_Staging_SSH_Keys`**: An "SSH Username with private key" credential type in Jenkins. This should contain the private SSH key corresponding to the public key authorized for the `ahsan_witslab` user on the EC2 instance.
+    *   **`trv_mock_server_utility_staging`**: A "Secret file" credential type in Jenkins. This file should contain the environment variables required by the application, formatted one per line (e.g., `VAR1=value1\nVAR2=value2`).
 
-## 📌 Notes
-Make sure your GKE nodes have the appropriate IAM roles and tags for NEG and Load Balancer integration.
+## Pipeline Configuration
 
-Always validate your configuration after Helm install/upgrade using:
+The pipeline uses the following environment variables defined in the `environment` block:
 
-```bash
-kubectl describe svc ingress-nginx-controller -n ingress
-```
+*   `EC2_USER`: `ahsan_witslab` - The username for SSH connection to the EC2 instance.
+*   `EC2_HOST`: `3.7.217.131` - The IP address of the target staging EC2 instance.
+*   `REPO_URL`: `https://github.com/ONDC-Official/mock-server-utility` - The URL of the Git repository to clone.
+*   `BRANCH_NAME`: `TRV` - The specific branch to check out and deploy.
+*   `CLONE_PATH`: `trv-mock-server-utility-staging` - The directory name on the EC2 instance where the repository will be cloned.
+
+## Pipeline Stages
+
+The pipeline is divided into the following stages:
+
+1.  **Load Secrets:**
+    *   Retrieves the content of the Jenkins secret file credential `trv_mock_server_utility_staging`.
+    *   Stores the content (expected to be environment variable definitions) into the `SECRET_ENV_VARS` Jenkins environment variable.
+
+2.  **Connect to EC2 & Clone Repo:**
+    *   Uses the `TRV_Staging_SSH_Keys` credential to establish an SSH connection to the EC2 instance (`ahsan_witslab@3.7.217.131`).
+    *   Checks if the target directory (`$CLONE_PATH`) exists on the EC2 instance.
+    *   If the directory exists, it navigates into it, resets any local changes (`git reset --hard`), checks out the specified branch (`$BRANCH_NAME`), and pulls the latest changes (`git pull origin $BRANCH_NAME`).
+    *   If the directory does not exist, it clones the repository (`$REPO_URL`) using the specified branch (`$BRANCH_NAME`) into the target directory (`$CLONE_PATH`).
+
+3.  **Load Environment Variables on EC2:**
+    *   Connects to the EC2 instance via SSH again.
+    *   Navigates into the cloned repository directory (`$CLONE_PATH`).
+    *   Takes the environment variables stored in the Jenkins `SECRET_ENV_VARS` variable and writes them into a `.env` file within the repository directory on the EC2 instance using `sudo tee`. This `.env` file is typically used by Docker Compose to inject environment variables into containers.
+
+4.  **Build & Deploy:**
+    *   Connects to the EC2 instance via SSH.
+    *   Navigates into the repository directory (`$CLONE_PATH`).
+    *   Stops any currently running containers defined in the `docker-compose.yml` file using `sudo docker-compose down`.
+    *   Builds the Docker images (if changes are detected or images don't exist) and starts the application services in detached mode (`-d`) using `sudo docker-compose up -d --build`.
+
+5.  **Clean Docker & Workspace:**
+    *   Connects to the EC2 instance via SSH.
+    *   Prints messages indicating cleanup.
+    *   **Note:** The command `sudo docker system prune -af` (which removes unused Docker resources like stopped containers, unused networks, dangling images, and build cache) is currently **commented out** in the `Jenkinsfile`.
+
+## Post Actions
+
+The pipeline includes `post` conditions:
+
+*   **`success`**: If all stages complete successfully, it prints "🎉 Deployment successful!".
+*   **`failure`**: If any stage fails, it prints "❌ Deployment failed!".
+
+## How to Use
+
+1.  Ensure all prerequisites are met (EC2 setup, Docker/Docker Compose installation, Jenkins credentials).
+2.  Create a new Jenkins Pipeline job.
+3.  Configure the job to use "Pipeline script from SCM".
+    *   Set the SCM to Git.
+    *   Provide the repository URL where this `Jenkinsfile` resides.
+    *   Specify the correct branch.
+    *   Ensure the "Script Path" field points to `Jenkinsfile` (this is usually the default).
+4.  Alternatively, you can choose "Pipeline script" and paste the content of this `Jenkinsfile` directly into the text area.
+5.  Save the job configuration.
+6.  Run the Jenkins job ("Build Now"). The pipeline will execute the defined stages.
